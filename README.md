@@ -21,6 +21,7 @@ docker-compose build
 ### Deploy Stack
 
 ```sh
+docker swarm init
 eval docker-compose config 2>/dev/null | docker stack deploy -c- cluster
 ```
 

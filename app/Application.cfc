@@ -1,4 +1,4 @@
-component {
+component extends="framework.three_one_zero" {
 	
 	this.name = "session_test_app";
 	
@@ -7,19 +7,41 @@ component {
 			&& server.system.environment.PERSIST_SESSIONS
 		) == true
 	);
-	
+
+	variables.framework = {
+		action = 'action',
+		usingSubsystems = true,
+		defaultSubsystem = 'home',
+		defaultSection = 'main',
+		defaultItem = 'default',
+		subsystemDelimiter = ':',
+		siteWideLayoutSubsystem = 'common',
+		reload = 'reload',
+		reloadApplicationOnEveryRequest = false,
+		unhandledPaths = '/flex2gateway',
+		preserveKeyURLKey = 'fw1pk',
+		maxNumContextsPreserved = 10,
+		cacheFileExists = false,
+		applicationKey = 'framework.one',
+		diEngine = 'di1',
+		diLocations = 'model,controllers',
+		diConfig = { },
+		routes = [ ],
+		routesCaseSensitive = true
+	};
+
 	if (persistSessions) {
 		this.cache.connections["session"] = {
 			  class: 'lucee.extension.io.cache.redis.RedisCache'
 			, storage: true
 			, custom: {
-				/* Jedis is a client library in Java for Redis. JedisPool creates a pool of connections to Redis 
-				* to reuse on demand, a pool that is thread safe and reliable as long as the resource is returned 
-				* to the pool when you are done with it. The settings below are configurations for managing the connection pool. 
-				* 
+				/* Jedis is a client library in Java for Redis. JedisPool creates a pool of connections to Redis
+				* to reuse on demand, a pool that is thread safe and reliable as long as the resource is returned
+				* to the pool when you are done with it. The settings below are configurations for managing the connection pool.
+				*
 				* http://www.baeldung.com/jedis-java-redis-client-library
 				* https://commons.apache.org/proper/commons-pool/apidocs/org/apache/commons/pool2/impl/BaseGenericObjectPool.html
-				
+
 				/* the minimum number of idle connections to maintain in the pool */
 				"setMinIdle":"16", 
 				/* whether connection will be validated when they are returned to the pool. 
@@ -62,15 +84,28 @@ component {
 	this.setClientCookies = true;
 
 	function onApplicationStart() {}
-	
-	function onRequestStart() {
+
+	function setupRequest() {
+		// use setupRequest to do initialization per request
 		if (structKeyExists(url, "reload")) {
 			onApplicationStart();
 			onSessionStart();
 		}
+
+		request.context.startTime = getTickCount();
 		request.persistSessions=persistSessions;
 	}
+
+
+//function onRequestStart() {
+		//if (structKeyExists(url, "reload")) {
+			//onApplicationStart();
+			//onSessionStart();
+		//}
+		//request.persistSessions=persistSessions;
+	//}
 	function onSessionStart() {
 		session.onSessionStartLastTriggered=now();
 	}
+
 }
